@@ -10,7 +10,6 @@
     <meta content="yes" name="apple-mobile-web-app-capable">
     <meta content="black" name="apple-mobile-web-app-status-bar-style">
     <meta content="telephone=no" name="format-detection">
-    <meta name="_xsrf" content="{{.xsrf_token}}" />
     <link rel="stylesheet" href="/static/css/style.css"/>
     <!-- 提示升级高级浏览器操作 -->
     <style>
@@ -30,7 +29,6 @@
 <body class="body_bj">
 <div id="particles-js">
     <div class="login layui-form">
-    {{/*<form onsubmit="return checkLength()">*/}}
         <div class="logo">
             <img src="/static/img/cat.jpeg" alt="">
         </div>
@@ -41,7 +39,6 @@
             <li><button class="btn" lay-submit lay-filter="login" type="submit">登 录</button></li>
             <li class="tar"><a href="/reception/forget">忘记密码？</a></li>
         </ul>
-    {{/*</form>*/}}
     </div>
 </div>
 
@@ -52,38 +49,20 @@
         let $ = layui.jquery,
                 layer = layui.layer,
                 form = layui.form;
-        var ajax = $.ajax;
-        $.extend({
-            ajax: function(url, options) {
-                if (typeof url === 'object') {
-                    options = url;
-                    url = undefined;
-                }
-                options = options || {};
-                url = options.url;
-                var xsrftoken = $('meta[name=_xsrf]').attr('content');
-                var headers = options.headers || {};
-                var domain = document.domain.replace(/\./ig, '\\.');
-                if (!/^(http:|https:).*/.test(url) || eval('/^(http:|https:)\\/\\/(.+\\.)*' + domain + '.*/').test(url)) {
-                    headers = $.extend(headers, {'X-Xsrftoken':xsrftoken});
-                }
-                options.headers = headers;
-                return ajax(url, options);
-            }
-        });
         form.verify({
             school: function(value){
-                if(value.length != 11 || isNaN(value)) {
+                if(value == "") {
+                    console.log(value)
                     return '请输入正确的学号';
                 }
             },
             password: function (value) {
-                if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value)){
-                    return '字母或者数字开头，区分大小写，最短4位最长16位';
+                if (value == ""){
+                    return '输入密码';
                 }
             },
             captcha: function (value) {
-                if (value.length != 6){
+                if (value == ""){
                     return '请输入正确的验证码';
                 }
             }
@@ -98,20 +77,10 @@
                     school: $('#school').val(),
                     password: $('#password').val(),
                     captcha: $('#captcha').val(),
-                    captchaId: $(".captcha-img").attr("src").split("/")[2].split(".")[0]
                 },
                 success:function(res){
                     console.log(res)
-                    switch (res.name ) {
-                        case 0:
-                            layer.msg(res.message);
-                            break;
-                        case -1:
-                            layer.msg(res.message);
-                            break;
-                        case 1:
-                            window.location.href="/reception/admin/information";
-                    }
+                            layer.msg(res);
                 },
                 error:function (data) {
                     console.log(data)
